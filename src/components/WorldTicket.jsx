@@ -1,0 +1,17 @@
+export default function WorldTicket({ data, compact = false }) {
+  const chartRows = (data.chart || []).filter((row) => row.minutes !== null && !row.excluded);
+  const chartMax = Math.max(30, ...chartRows.map((row) => row.minutes));
+  return (
+    <article className={`profile-card world-ticket${compact ? ' compact-ticket' : ''}`} aria-label={`Ficha de análisis de ${data.name}`}>
+      <div className="card-topline"><span><i className="card-dot" /> {data.kind === 'traffic' ? 'REPORTE DE TRÁNSITO · IES N.º 9' : data.kind === 'penalty' ? 'FICHA DE PENAL · IES N.º 9' : data.kind === 'decision' ? 'FICHA DE DECISIÓN · IES N.º 9' : 'FICHA DE ANÁLISIS · IES N.º 9'}</span><span>DATA·LAB</span></div>
+      <div className="card-main"><div className="report-orbit"><span>{data.glyph || '▥'}</span></div><span className="verified">✦ {data.kind === 'traffic' ? 'EXPERIMENTO DE DATOS' : data.kind === 'penalty' ? 'SIMULADOR DE PROBABILIDAD' : data.kind === 'decision' ? 'DATOS + PROBABILIDAD' : 'DEL DATO A LA DECISIÓN'}</span><h2>{data.world}</h2><p className="profile-tagline">{data.subtitle}</p>
+        {(data.kind === 'penalty' || data.kind === 'decision') && <div className="ticket-chart-caption">{data.kind === 'penalty' ? 'PROBABILIDAD TEÓRICA DE GOL POR ZONA' : 'PROBABILIDAD DE LLUVIA POR ESCENARIO'}</div>}
+        <div className="report-chart" aria-label={data.kind === 'traffic' ? 'Espera promedio por estrategia' : data.kind === 'penalty' ? 'Probabilidad teórica de gol por zona' : data.kind === 'decision' ? 'Probabilidad de lluvia por escenario' : 'Gráfico de tiempos registrados'}>{chartRows.map((row) => <div className={`report-chart-column${row.excluded ? ' excluded' : ''}`} key={row.time}><span style={{ height: `${Math.max(5, row.minutes / chartMax * 100)}%` }} /><small>{['traffic', 'penalty', 'decision'].includes(data.kind) ? row.time : `${row.time.slice(0, 2)}:${row.time.slice(3)}`}</small></div>)}</div>
+        <p className="world-story">{data.story}</p>
+        <div className="relic-card-list"><div className="abilities-heading"><span>LO QUE PRACTICASTE</span><span>{(data.relics || []).length} PASOS</span></div><div className="relic-card-grid">{(data.relics || []).map((relic, index) => <span className="relic-card-item" key={`${relic}-${index}`}><i>0{index + 1}</i>{relic}</span>)}</div></div>
+        <div className="fuel-block"><span className="fuel-icon">⌖</span><span><small>{data.kind === 'traffic' ? 'COMPARACIÓN' : data.kind === 'penalty' ? 'PROBABILIDAD TEÓRICA' : data.kind === 'decision' ? 'TU DECISIÓN' : 'ANALISTA'}</small><strong>{data.kind === 'traffic' ? 'Fijo vs. adaptativo' : data.kind === 'penalty' ? `${data.confidence || 0}% de gol` : data.kind === 'decision' ? data.subtitle.includes('Sí llevarías') ? 'Llevar paraguas' : data.subtitle.includes('no llevarlo') ? 'Sin paraguas' : 'Depende del plan' : data.name}</strong></span>{data.kind === 'traffic' ? <span className="report-demand high">72 S<br />SIMULADOS</span> : data.kind === 'penalty' ? <span className="report-demand high">AZAR<br />DIDÁCTICO</span> : data.kind === 'decision' ? <span className="report-demand high">60%<br />LLUVIA</span> : <span className={`report-demand ${data.prediction === 'ALTA' ? 'high' : ''}`}>DEMANDA {data.prediction || '—'}</span>}</div>
+      </div>
+      <div className="card-bottom"><span>DATOS <b>→</b> INFORMACIÓN <b>→</b> DECISIONES</span><span>{data.kind === 'penalty' ? 'PROBABILIDADES DIDÁCTICAS · NO REALES' : 'SIMULACIÓN · FIN EDUCATIVO'}</span></div>
+    </article>
+  );
+}
